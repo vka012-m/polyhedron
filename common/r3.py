@@ -1,4 +1,4 @@
-from math import sin, cos
+from math import sin, cos, acos, pi
 
 
 class R3:
@@ -41,6 +41,35 @@ class R3:
             self.y * other.z - self.z * other.y,
             self.z * other.x - self.x * other.z,
             self.x * other.y - self.y * other.x)
+
+    COS_PI_7 = cos(pi / 7)
+    COS_PI_7_SQ = COS_PI_7 ** 2
+
+    # Внутри куба
+    @staticmethod
+    def outside_cube(point):
+        # Проверка, что точка лежит вне куба [-0.5, 0.5]^3
+        return abs(point.x) > 0.5 or abs(point.y) > 0.5 or abs(point.z) > 0.5
+
+    @staticmethod
+    def angle_le_pi_7(normal):
+        # Проверка, что угол между нормалью и вертикалью <= π/7
+        # Квадрат длины нормали
+        len_sq = normal.x ** 2 + normal.y ** 2 + normal.z ** 2
+
+        # Если нормаль нулевая - возвращаем False
+        if len_sq < 1e-12:
+            return False
+
+        # Скалярное произведение с вертикалью (0,0,1)
+        n_dot_v = normal.z
+
+        # Если угол тупой (нормаль направлена вниз) - не подходит
+        if n_dot_v < 0:
+            return False
+
+        # Проверка: (n • v)^2 >= cos²(π/7) * |n|^2
+        return n_dot_v ** 2 >= R3.COS_PI_7_SQ * len_sq
 
 
 if __name__ == "__main__":  # pragma: no cover
