@@ -1,4 +1,4 @@
-from math import pi
+from math import pi, sqrt
 from functools import reduce
 from operator import add
 from common.r3 import R3
@@ -7,6 +7,7 @@ from common.tk_drawer import TkDrawer
 
 class Segment:
     """ Одномерный отрезок """
+
     # Параметры конструктора: начало и конец отрезка (числа)
 
     def __init__(self, beg, fin):
@@ -42,6 +43,8 @@ class Edge:
         self.beg, self.fin = beg, fin
         # Список «просветов»
         self.gaps = [Segment(Edge.SBEG, Edge.SFIN)]
+        # Является ли ребро полностью видимым?
+        self.visible = True
 
     # Учёт тени от одной грани
     def shadow(self, facet):
@@ -60,10 +63,15 @@ class Edge:
                 facet.vertexes[0], facet.h_normal()))
         if shade.is_degenerate():
             return
+
         # Преобразование списка «просветов», если тень невырождена
         gaps = [s.subtraction(shade) for s in self.gaps]
         self.gaps = [
             s for s in reduce(add, gaps, []) if not s.is_degenerate()]
+        if len(self.gaps) == 0 or (
+                round(self.gaps[0].beg, 10) != Edge.SBEG
+                or round(self.gaps[0].fin, 10) != Edge.SFIN):
+            self.visible = False
 
     # Преобразование одномерных координат в трёхмерные
     def r3(self, t):
@@ -83,10 +91,13 @@ class Edge:
 
 class Facet:
     """ Грань полиэдра """
+
     # Параметры конструктора: список вершин
 
-    def __init__(self, vertexes):
+    def __init__(self, vertexes, edges):
         self.vertexes = vertexes
+        self.edges = edges
+        self.visible = True
 
     # «Вертикальна» ли грань?
     def is_vertical(self):
@@ -95,7 +106,7 @@ class Facet:
     # Нормаль к «горизонтальному» полупространству
     def h_normal(self):
         n = (
-            self.vertexes[1] - self.vertexes[0]).cross(
+                self.vertexes[1] - self.vertexes[0]).cross(
             self.vertexes[2] - self.vertexes[0])
         return n * (-1.0) if n.dot(Polyedr.V) < 0.0 else n
 
@@ -109,12 +120,24 @@ class Facet:
     def _vert(self, k):
         n = (self.vertexes[k] - self.vertexes[k - 1]).cross(Polyedr.V)
         return n * \
-            (-1.0) if n.dot(self.vertexes[k - 1] - self.center()) < 0.0 else n
+               (-1.0) if n.dot(self.vertexes[k - 1] - self.center()) < 0.0 else n
 
     # Центр грани
     def center(self):
         return sum(self.vertexes, R3(0.0, 0.0, 0.0)) * \
             (1.0 / len(self.vertexes))
+
+    def area(self):
+        center = self.center()
+        sum_area = 0.0
+        for edge in self.edges:
+            v1 = edge.beg
+            v2 = edge.fin
+            l1 = v1 - center
+            l2 = v2 - center
+            vec = l1.cross(l2)
+            sum_area += 0.5 * abs(sqrt(vec.dot(vec)))
+        return sum_area
 
 
 class Polyedr:
@@ -128,6 +151,8 @@ class Polyedr:
         # списки вершин, рёбер и граней полиэдра
         self.vertexes, self.edges, self.facets = [], [], []
 
+        # сумма площадей «граней с полностью видимыми рёбрами»
+        self.sum_area = 0.0
         # список строк файла
         with open(file) as f:
             for i, line in enumerate(f):
@@ -135,7 +160,7 @@ class Polyedr:
                     # обрабатываем первую строку; buf - вспомогательный массив
                     buf = line.split()
                     # коэффициент гомотетии
-                    c = float(buf.pop(0))
+                    self.c = float(buf.pop(0))
                     # углы Эйлера, определяющие вращение
                     alpha, beta, gamma = (float(x) * pi / 180.0 for x in buf)
                 elif i == 1:
@@ -145,7 +170,7 @@ class Polyedr:
                     # задание всех вершин полиэдра
                     x, y, z = (float(x) for x in line.split())
                     self.vertexes.append(R3(x, y, z).rz(
-                        alpha).ry(beta).rz(gamma) * c)
+                        alpha).ry(beta).rz(gamma) * self.c)
                 else:
                     # вспомогательный массив
                     buf = line.split()
@@ -154,16 +179,24 @@ class Polyedr:
                     # массив вершин этой грани
                     vertexes = list(self.vertexes[int(n) - 1] for n in buf)
                     # задание рёбер грани
+                    edges = []
                     for n in range(size):
                         self.edges.append(Edge(vertexes[n - 1], vertexes[n]))
+                        edges.append(Edge(vertexes[n - 1], vertexes[n]))
                     # задание самой грани
-                    self.facets.append(Facet(vertexes))
+                    self.facets.append(Facet(vertexes, edges))
 
     # Метод изображения полиэдра
     def draw(self, tk):  # pragma: no cover
         tk.clean()
-        for e in self.edges:
-            for f in self.facets:
-                e.shadow(f)
-            for s in e.gaps:
-                tk.draw_line(e.r3(s.beg), e.r3(s.fin))
+        for facet in self.facets:
+            for e in facet.edges:
+                for f in self.facets:
+                    e.shadow(f)
+                if not e.visible:
+                    facet.visible = False
+                for s in e.gaps:
+                    tk.draw_line(e.r3(s.beg), e.r3(s.fin))
+            if facet.visible and R3.outside_cube(facet.center()) and \
+                    R3.angle_le_pi_7(facet.h_normal()):
+                self.sum_area += facet.area() / self.c ** 2
