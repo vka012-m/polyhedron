@@ -47,15 +47,15 @@ class R3:
 
     # Внутри куба
     @staticmethod
-    def outside_cube(point):
+    def outside_cube(point, c):
         # Проверка, что точка лежит вне куба [-0.5, 0.5]^3
-        return abs(point.x) > 0.5 or abs(point.y) > 0.5 or abs(point.z) > 0.5
+        return abs(point.x / c) > 0.5 or abs(point.y / c) > 0.5 or abs(point.z / c) > 0.5
 
     @staticmethod
-    def angle_le_pi_7(normal):
+    def angle_le_pi_7(normal, c):
         # Проверка, что угол между нормалью и вертикалью <= π/7
         # Квадрат длины нормали
-        len_sq = normal.x ** 2 + normal.y ** 2 + normal.z ** 2
+        len_sq = (normal.x / c) ** 2 + (normal.y / c) ** 2 + (normal.z / c) ** 2
 
         # Если нормаль нулевая - возвращаем False
         if len_sq < 1e-12:
