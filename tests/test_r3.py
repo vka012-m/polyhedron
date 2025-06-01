@@ -110,10 +110,19 @@ class TestR3(unittest.TestCase):
                          R3(8.0, 8.0, -8.0))
         
     def test_outside_cube01(self):
-        self.assertTrue(R3.outside_cube(R3(1.0, 0.0, 0.0)))
+        self.assertTrue(R3.outside_cube(R3(1.0, 0.0, 0.0), 1.0))
 
     def test_outside_cube02(self):
-        self.assertTrue(R3.outside_cube(R3(5.0, 50.0, 0.0)))
+        self.assertFalse(R3.outside_cube(R3(0.1, 0.1, 0.1), 10.0))
 
     def test_outside_cube03(self):
-        self.assertTrue(R3.outside_cube(R3(5.0, 5.0, 0.0)))
+        self.assertFalse(R3.outside_cube(R3(0.4, 0.4, 0.4), 1.0))
+        
+    def test_angle_le_pi_701(self):
+        self.assertTrue(R3.angle_le_pi_7(R3(10.0, 0.0, 0.5), 1.0))
+
+    def test_angle_le_pi_702(self):
+        self.assertFalse(R3.angle_le_pi_7(R3(0.0, 0.0, 0.0), 1.0))
+
+    def test_angle_le_pi_703(self):
+        self.assertFalse(R3.angle_le_pi_7(R3(1.0, 0.0, -0.5), 1.0))
