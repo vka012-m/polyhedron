@@ -69,7 +69,7 @@ class R3:
             return False
 
         # Проверка: (n • v)^2 >= cos²(π/7) * |n|^2
-        return n_dot_v ** 2 >= R3.COS_PI_7_SQ * len_sq
+        return n_dot_v ** 2 <= R3.COS_PI_7_SQ * len_sq
 
 
 if __name__ == "__main__":  # pragma: no cover
