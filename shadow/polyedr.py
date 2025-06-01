@@ -197,6 +197,6 @@ class Polyedr:
                     facet.visible = False
                 for s in e.gaps:
                     tk.draw_line(e.r3(s.beg), e.r3(s.fin))
-            if facet.visible and R3.outside_cube(facet.center()) and \
-                    R3.angle_le_pi_7(facet.h_normal()):
+            if facet.visible and R3.outside_cube(facet.center(), self.c) and \
+                    R3.angle_le_pi_7(facet.h_normal(), self.c):
                 self.sum_area += facet.area() / self.c ** 2
