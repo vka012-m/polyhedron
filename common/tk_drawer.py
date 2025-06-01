@@ -23,7 +23,7 @@ class TkDrawer:
     def __init__(self):
         self.root = Tk()
         self.root.title("Изображение проекции полиэдра")
-        self.root.geometry(f"{SIZE+5}x{SIZE+5}")
+        self.root.geometry(f"{SIZE + 5}x{SIZE + 5}")
         self.root.resizable(False, False)
         self.root.bind('<Control-c>', quit)
         self.canvas = Canvas(self.root, width=SIZE, height=SIZE)
@@ -48,6 +48,7 @@ if __name__ == "__main__":  # pragma: no cover
 
     import time
     from r3 import R3
+
     tk = TkDrawer()
     tk.clean()
     tk.draw_line(R3(0.0, 0.0, 0.0), R3(100.0, 100.0, 0.0))
