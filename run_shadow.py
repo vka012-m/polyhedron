@@ -6,7 +6,7 @@ from shadow.polyedr import Polyedr
 
 tk = TkDrawer()
 try:
-    for name in ["tetrahedron", "octahedron", "ccc", "cube", "box", "king", "cow"]:
+    for name in ["cube_test", "tetrahedron", "octahedron", "ccc", "cube", "box", "king", "cow"]:
         print("=============================================================")
         print(f"Начало работы с полиэдром '{name}'")
         start_time = time()
@@ -14,9 +14,12 @@ try:
         Poly.draw(tk)
         delta_time = time() - start_time
         print(f"Изображение полиэдра '{name}' заняло {delta_time} сек.")
-        print("Cумма площадей «граней с полностью видимыми рёбрами», "
-              "проекция центра которых находится "
-              "строго внутри окружности x^2+y^2=4:", Poly.sum_area)
+        print("сумма площадей проекций "
+        "«граней с полностью видимыми рёбрами», "
+        "образующих с горизонтальной плоскостью "
+        "угол не более π/7, центр которых находится"
+        "строго вне куба единичного объёма с центром"
+        "в начале координат", Poly.sum_area)
         input("Hit 'Return' to continue -> ")
 except (EOFError, KeyboardInterrupt):
     print("\nStop")
