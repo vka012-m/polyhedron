@@ -120,7 +120,8 @@ class Facet:
     def _vert(self, k):
         n = (self.vertexes[k] - self.vertexes[k - 1]).cross(Polyedr.V)
         return n * \
-               (-1.0) if n.dot(self.vertexes[k - 1] - self.center()) < 0.0 else n
+            (-1.0) if n.dot(self.vertexes[k - 1] - self.center()) \
+            < 0.0 else n
 
     # Центр грани
     def center(self):
@@ -200,3 +201,4 @@ class Polyedr:
             if facet.visible and R3.outside_cube(facet.center(), self.c) and \
                     R3.angle_le_pi_7(facet.h_normal(), self.c):
                 self.sum_area += facet.area() / self.c ** 2
+                print(self.sum_area)
