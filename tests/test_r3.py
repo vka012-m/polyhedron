@@ -108,7 +108,7 @@ class TestR3(unittest.TestCase):
     def test_cross04(self):
         self.assertEqual(R3ApproxMatcher(self.a.cross(R3(3.0, -2.0, 1.0))),
                          R3(8.0, 8.0, -8.0))
-        
+
     def test_outside_cube01(self):
         self.assertTrue(R3.outside_cube(R3(1.0, 0.0, 0.0), 1.0))
 
@@ -117,7 +117,7 @@ class TestR3(unittest.TestCase):
 
     def test_outside_cube03(self):
         self.assertFalse(R3.outside_cube(R3(0.4, 0.4, 0.4), 1.0))
-        
+
     def test_angle_le_pi_701(self):
         self.assertFalse(R3.angle_le_pi_7(R3(10.0, 0.0, 0.5), 1.0))
 
