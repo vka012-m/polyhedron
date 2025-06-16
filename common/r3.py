@@ -49,16 +49,17 @@ class R3:
     @staticmethod
     def outside_cube(point, c):
         # Проверка, что точка лежит вне куба [-0.5, 0.5]^3
-        return abs(point.x / c) > 0.5 or abs(point.y / c) > 0.5 or abs(point.z / c) > 0.5
+        return abs(point.x / c) > 0.5 or abs(point.y / c) > 0.5 \
+            or abs(point.z / c) > 0.5
 
     @staticmethod
     def angle_le_pi_7(normal, c):
         # Проверка, что угол между нормалью и вертикалью <= π/7
         # Квадрат длины нормали
-        len_sq = (normal.x / c) ** 2 + (normal.y / c) ** 2 + (normal.z / c) ** 2
+        len_s = (normal.x / c) ** 2 + (normal.y / c) ** 2 + (normal.z / c) ** 2
 
         # Если нормаль нулевая - возвращаем False
-        if len_sq < 1e-12:
+        if len_s < 1e-12:
             return False
 
         # Скалярное произведение с вертикалью (0,0,1)
@@ -69,7 +70,7 @@ class R3:
             return False
 
         # Проверка: (n • v)^2 >= cos²(π/7) * |n|^2
-        return n_dot_v ** 2 >= R3.COS_PI_7_SQ * len_sq
+        return n_dot_v ** 2 >= R3.COS_PI_7_SQ * len_s
 
 
 if __name__ == "__main__":  # pragma: no cover
